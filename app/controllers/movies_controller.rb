@@ -1,12 +1,29 @@
 class MoviesController < ApplicationController
+    SORT_COLUMNS = { "title" => :title, "release_date" => :release_date }.freeze
   before_action :set_movie, only: %i[ show edit update destroy ]
 
   # GET /movies or /movies.json
   def index
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = params[:ratings].present? ? params[:ratings].keys & @all_ratings : @all_ratings
+    form_submitted = params[:filters_submitted].present? || params[:sort_by].present?
+
+    @ratings_to_show =
+      if params[:ratings].present?
+        params[:ratings].keys & @all_ratings
+      elsif form_submitted
+        @all_ratings
+      else
+        session[:ratings] || @all_ratings
+      end
     @ratings_to_show = @all_ratings if @ratings_to_show.empty?
-    @movies = Movie.with_ratings(@ratings_to_show)
+
+    requested_sort = params[:sort_by] || session[:sort_by]
+    @sort_by = SORT_COLUMNS.key?(requested_sort) ? requested_sort : "title"
+
+    session[:ratings] = @ratings_to_show
+    session[:sort_by] = @sort_by
+
+    @movies = Movie.with_ratings(@ratings_to_show).order(SORT_COLUMNS[@sort_by])
   end
 
   # GET /movies/1 or /movies/1.json
