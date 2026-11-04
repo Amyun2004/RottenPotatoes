@@ -1,0 +1,11 @@
+one:
+  title: Aladdin
+  rating: G
+  description: A young adventurer discovers a magic lamp.
+  release_date: 1992-11-25
+
+two:
+  title: The Terminator
+  rating: R
+  description: A time traveler arrives with a dangerous mission.
+  release_date: 1984-10-26
